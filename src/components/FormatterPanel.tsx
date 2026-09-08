@@ -54,7 +54,7 @@ export function FormatterPanel() {
 
   return (
     <>
-      <div className="flex items-center justify-between border-b border-gray-800 px-6 py-3">
+      <div className="flex items-center justify-between border-b border-gray-200 px-6 py-3 dark:border-gray-800">
         <div className="flex items-center gap-6">
           <div className="flex">
             <ToggleButton active={mode === 'beautify'} onClick={applyBeautify}>
@@ -79,26 +79,26 @@ export function FormatterPanel() {
         <div className="flex gap-2">
           <button
             onClick={handleCopy}
-            className="border border-gray-700 px-3 py-1.5 text-xs font-bold tracking-wide text-gray-400 hover:text-gray-200"
+            className="border border-gray-300 px-3 py-1.5 text-xs font-bold tracking-wide text-gray-500 hover:text-gray-900 dark:border-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
           >
             Copy
           </button>
           <button
             onClick={handleClear}
-            className="border border-gray-700 px-3 py-1.5 text-xs font-bold tracking-wide text-gray-400 hover:text-gray-200"
+            className="border border-gray-300 px-3 py-1.5 text-xs font-bold tracking-wide text-gray-500 hover:text-gray-900 dark:border-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
           >
             Clear
           </button>
           <button
             onClick={handleSample}
-            className="border border-gray-700 px-3 py-1.5 text-xs font-bold tracking-wide text-gray-400 hover:text-gray-200"
+            className="border border-gray-300 px-3 py-1.5 text-xs font-bold tracking-wide text-gray-500 hover:text-gray-900 dark:border-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
           >
             Sample
           </button>
         </div>
       </div>
 
-      <div className="relative m-4 flex-1 border border-gray-800">
+      <div className="relative m-4 flex-1 border border-gray-200 dark:border-gray-800">
         <Corner className="-left-1.5 -top-1.5" />
         <Corner className="-right-1.5 -top-1.5" />
         <Corner className="-bottom-1.5 -left-1.5" />
@@ -108,11 +108,11 @@ export function FormatterPanel() {
           onChange={(e) => setContent(e.target.value)}
           spellCheck={false}
           placeholder="Paste or type JSON here..."
-          className="h-full min-h-[320px] w-full resize-none bg-transparent p-4 text-sm text-gray-200 outline-none placeholder:text-gray-600"
+          className="h-full min-h-[320px] w-full resize-none bg-transparent p-4 text-sm text-gray-900 outline-none placeholder:text-gray-400 dark:text-gray-200 dark:placeholder:text-gray-600"
         />
       </div>
 
-      <div className="flex items-center justify-between border-y border-gray-800 px-6 py-2 text-xs text-gray-500">
+      <div className="flex items-center justify-between border-y border-gray-200 px-6 py-2 text-xs text-gray-500 dark:border-gray-800">
         <span>
           {stats.lines} lines &nbsp; {stats.chars} chars &nbsp; {stats.bytes} B
         </span>
@@ -122,15 +122,15 @@ export function FormatterPanel() {
       </div>
 
       {content.length > 0 && result.error && (
-        <div className="m-4 border border-red-800 bg-red-950/20 p-4">
+        <div className="m-4 border border-red-300 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950/20">
           <div className="flex items-baseline gap-3">
-            <span className="text-sm font-bold tracking-wide text-red-400">PARSE ERROR</span>
-            <span className="text-xs text-gray-400">
+            <span className="text-sm font-bold tracking-wide text-red-600 dark:text-red-400">PARSE ERROR</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">
               line {result.error.line}, column {result.error.column}
             </span>
           </div>
-          <p className="mt-2 text-sm text-gray-300">{result.error.message}</p>
-          <pre className="mt-3 overflow-x-auto bg-black/30 p-3 text-sm text-gray-300">
+          <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">{result.error.message}</p>
+          <pre className="mt-3 overflow-x-auto bg-black/5 p-3 text-sm text-gray-700 dark:bg-black/30 dark:text-gray-300">
             <code>
               {String(result.error.line).padStart(2, ' ')} | {errorLineText}
               {'\n'}
