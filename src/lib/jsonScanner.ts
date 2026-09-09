@@ -80,10 +80,10 @@ function parseObject(s: Scanner): void {
       advance(s)
       continue
     }
-    break
+    if (peek(s) === '}') break
+    fail(s, `Expected ',' or '}' after property value, but found '${peek(s) ?? 'end of input'}'`)
   }
-  skipWhitespace(s)
-  expect(s, '}', 'to close object')
+  advance(s) // }
 }
 
 function parseArray(s: Scanner): void {
@@ -100,16 +100,21 @@ function parseArray(s: Scanner): void {
       advance(s)
       continue
     }
-    break
+    if (peek(s) === ']') break
+    const found = peek(s)
+    const hint = found === ':' ? ` (the array above may be missing its closing ']')` : ''
+    fail(s, `Expected ',' or ']' after array element, but found '${found ?? 'end of input'}'${hint}`)
   }
-  skipWhitespace(s)
-  expect(s, ']', 'to close array')
+  advance(s) // ]
 }
 
 function parseString(s: Scanner): void {
   advance(s) // opening "
   while (true) {
     if (s.pos >= s.raw.length) {
+      fail(s, 'Unterminated string')
+    }
+    if (peek(s) === '\n' || peek(s) === '\r') {
       fail(s, 'Unterminated string')
     }
     const ch = advance(s)

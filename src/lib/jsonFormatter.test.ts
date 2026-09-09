@@ -118,6 +118,45 @@ describe('validate', () => {
     expect(result.error?.column).toBe(8)
   })
 
+  test('reports unterminated string at the line it breaks on, not a later line', () => {
+    const input = '{\n  "name": "json-toolkit,\n  "version": 1\n}'
+    const result = validate(input)
+
+    expect(result.valid).toBe(false)
+    expect(result.error?.line).toBe(2)
+    expect(result.error?.column).toBe(25)
+    expect(result.error?.message).toBe('Unterminated string')
+  })
+
+  test('hints at a missing closing bracket when an array is left open before a new object key', () => {
+    const input = '{\n  "tags": [\n    "fast",\n    "local"\n  ,\n  "active": true\n}'
+    const result = validate(input)
+
+    expect(result.valid).toBe(false)
+    expect(result.error?.line).toBe(6)
+    expect(result.error?.message).toBe(
+      "Expected ',' or ']' after array element, but found ':' (the array above may be missing its closing ']')",
+    )
+  })
+
+  test('reports a missing comma between object properties', () => {
+    const input = '{\n  "name": "json-toolkit"\n  "version": 1\n}'
+    const result = validate(input)
+
+    expect(result.valid).toBe(false)
+    expect(result.error?.line).toBe(3)
+    expect(result.error?.column).toBe(3)
+    expect(result.error?.message).toBe("Expected ',' or '}' after property value, but found '\"'")
+  })
+
+  test('reports a missing comma between array elements', () => {
+    const result = validate('[1 2]')
+
+    expect(result.valid).toBe(false)
+    expect(result.error?.column).toBe(4)
+    expect(result.error?.message).toBe("Expected ',' or ']' after array element, but found '2'")
+  })
+
   test('reports trailing comma in an array', () => {
     const result = validate('[1, 2,]')
 
