@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { beautify, minify, validate } from '../lib/jsonFormatter'
+import type { HistoryEntry } from '../hooks/useHistory'
 import { Corner } from './ui/Corner'
 import { ToggleButton } from './ui/ToggleButton'
 
@@ -7,10 +8,25 @@ const SAMPLE = '{\n  "name": "json-toolkit",\n  "version": 1,\n  "tags": ["fast"
 
 type Mode = 'beautify' | 'minify'
 
-export function FormatterPanel() {
+export function FormatterPanel({
+  onRecordHistory,
+  restoreEntry,
+}: {
+  onRecordHistory?: (mode: Mode, output: string) => void
+  restoreEntry?: HistoryEntry | null
+}) {
   const [content, setContent] = useState('')
   const [mode, setMode] = useState<Mode>('beautify')
   const [indent, setIndent] = useState(2)
+  const gutterRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (restoreEntry) {
+      setContent(restoreEntry.output)
+      setMode(restoreEntry.mode)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [restoreEntry?.id])
 
   const result = useMemo(() => validate(content), [content])
   const stats = useMemo(() => {
@@ -19,11 +35,20 @@ export function FormatterPanel() {
     const bytes = new TextEncoder().encode(content).length
     return { lines, chars, bytes }
   }, [content])
+  const lineCount = content.split('\n').length
+
+  function handleScroll(e: React.UIEvent<HTMLTextAreaElement>) {
+    if (gutterRef.current) {
+      gutterRef.current.scrollTop = e.currentTarget.scrollTop
+    }
+  }
 
   function applyBeautify() {
     try {
-      setContent(beautify(content, indent))
+      const output = beautify(content, indent)
+      setContent(output)
       setMode('beautify')
+      onRecordHistory?.('beautify', output)
     } catch {
       // invalid JSON — error panel below already explains why
     }
@@ -31,7 +56,8 @@ export function FormatterPanel() {
 
   function applyMinify() {
     try {
-      setContent(minify(content))
+      const output = minify(content)
+      setContent(output)
       setMode('minify')
     } catch {
       // invalid JSON — error panel below already explains why
@@ -98,18 +124,30 @@ export function FormatterPanel() {
         </div>
       </div>
 
-      <div className="relative m-4 flex-1 border border-gray-200 dark:border-gray-800">
+      <div className="relative m-4 flex flex-1 flex-col border border-gray-200 dark:border-gray-800">
         <Corner className="-left-1.5 -top-1.5" />
         <Corner className="-right-1.5 -top-1.5" />
         <Corner className="-bottom-1.5 -left-1.5" />
         <Corner className="-bottom-1.5 -right-1.5" />
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          spellCheck={false}
-          placeholder="Paste or type JSON here..."
-          className="h-full min-h-[320px] w-full resize-none bg-transparent p-4 text-sm text-gray-900 outline-none placeholder:text-gray-400 dark:text-gray-200 dark:placeholder:text-gray-600"
-        />
+        <div className="flex min-h-[320px] flex-1">
+          <div
+            ref={gutterRef}
+            aria-hidden="true"
+            className="select-none overflow-hidden bg-gray-50 p-4 text-right font-mono text-sm leading-normal text-gray-400 dark:bg-gray-900/40 dark:text-gray-600"
+          >
+            {Array.from({ length: lineCount }, (_, i) => (
+              <div key={i}>{i + 1}</div>
+            ))}
+          </div>
+          <textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            onScroll={handleScroll}
+            spellCheck={false}
+            placeholder="Paste or type JSON here..."
+            className="w-full flex-1 resize-none bg-transparent p-4 font-mono text-sm leading-normal text-gray-900 outline-none placeholder:text-gray-400 dark:text-gray-200 dark:placeholder:text-gray-600"
+          />
+        </div>
       </div>
 
       <div className="flex items-center justify-between border-y border-gray-200 px-6 py-2 text-xs text-gray-500 dark:border-gray-800">

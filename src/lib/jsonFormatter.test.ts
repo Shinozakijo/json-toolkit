@@ -13,6 +13,44 @@ describe('beautify', () => {
 
     expect(result).toBe('{\n    "a": 1\n}')
   })
+
+  test('expands a string field containing a nested JSON object', () => {
+    const raw = JSON.stringify({ message: JSON.stringify({ a: 1 }) })
+
+    const result = beautify(raw)
+
+    expect(result).toBe('{\n  "message": {\n    "a": 1\n  }\n}')
+  })
+
+  test('expands JSON strings nested multiple levels deep', () => {
+    const raw = JSON.stringify({ outer: JSON.stringify({ inner: JSON.stringify({ a: 1 }) }) })
+
+    const result = beautify(raw)
+
+    expect(result).toBe('{\n  "outer": {\n    "inner": {\n      "a": 1\n    }\n  }\n}')
+  })
+
+  test('leaves plain non-JSON strings untouched', () => {
+    const result = beautify('{"a":"hello"}')
+
+    expect(result).toBe('{\n  "a": "hello"\n}')
+  })
+
+  test('leaves strings that parse to a JSON primitive untouched', () => {
+    const raw = JSON.stringify({ a: 'true', b: '42', c: 'null' })
+
+    const result = beautify(raw)
+
+    expect(result).toBe('{\n  "a": "true",\n  "b": "42",\n  "c": "null"\n}')
+  })
+
+  test('expands JSON strings found inside arrays', () => {
+    const raw = JSON.stringify({ items: [JSON.stringify({ a: 1 }), 'plain'] })
+
+    const result = beautify(raw)
+
+    expect(result).toBe('{\n  "items": [\n    {\n      "a": 1\n    },\n    "plain"\n  ]\n}')
+  })
 })
 
 describe('minify', () => {
