@@ -1,75 +1,48 @@
-# React + TypeScript + Vite
+# JSON Toolkit
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A fast, local-only JSON formatter and validator. Paste JSON, beautify or minify it, and get precise, line/column-accurate error messages when it's invalid — all in the browser, nothing sent to a server.
 
-Currently, two official plugins are available:
+**Live demo:** [add your Vercel URL here after deploying]
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
 
-## React Compiler
+- **Beautify / Minify** — reformat JSON with 2 or 4-space indentation, or collapse it to a single line
+- **Real-time validation** — see valid/invalid status as you type
+- **Precise error messages** — a custom scanner reports the exact line, column, and a code snippet with a caret pointing at the problem (unterminated strings, missing commas, unclosed brackets, etc.), instead of a generic "unexpected token"
+- **Session history** — every formatting action is saved to a sidebar (persisted in `sessionStorage`) so you can revisit or restore a previous result
+- **Dark / light theme** toggle
+- **Line numbers and stats** — line count, character count, byte size
+- **Runs entirely client-side** — no data ever leaves the tab
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tech stack
 
-## Expanding the ESLint configuration
+- [React 19](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
+- [Vite](https://vite.dev/) for dev server and build
+- [Tailwind CSS](https://tailwindcss.com/) for styling
+- [Vitest](https://vitest.dev/) for the formatter/scanner test suite
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Getting started
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Other scripts:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```bash
+npm run build    # type-check and build for production
+npm run test     # run the Vitest suite
+npm run lint     # run ESLint
+```
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Project structure
 
+```
+src/
+  components/       UI components (formatter panel, header, history sidebar)
+  hooks/            useHistory (session history), useTheme (dark/light)
+  lib/
+    jsonFormatter.ts     beautify / minify / validate
+    jsonScanner.ts       hand-written scanner producing precise error locations
 ```
