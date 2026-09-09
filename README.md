@@ -2,7 +2,7 @@
 
 A fast, local-only JSON formatter and validator. Paste JSON, beautify or minify it, and get precise, line/column-accurate error messages when it's invalid — all in the browser, nothing sent to a server.
 
-**Live demo:** [add your Vercel URL here after deploying]
+**Live demo:** [json-toolkit-pi.vercel.app](https://json-toolkit-pi.vercel.app/)
 
 ## Features
 
