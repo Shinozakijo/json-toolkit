@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { beautify, minify, validate } from '../lib/jsonFormatter'
+import { beautify, fixDoubledQuotes, minify, validate } from '../lib/jsonFormatter'
 import type { HistoryEntry } from '../hooks/useHistory'
 import { Corner } from './ui/Corner'
 import { ToggleButton } from './ui/ToggleButton'
@@ -29,6 +29,10 @@ export function FormatterPanel({
   }, [restoreEntry?.id])
 
   const result = useMemo(() => validate(content), [content])
+  const doubledQuotesFix = useMemo(
+    () => (result.valid ? null : fixDoubledQuotes(content)),
+    [content, result.valid],
+  )
   const stats = useMemo(() => {
     const lines = content.length === 0 ? 0 : content.split('\n').length
     const chars = content.length
@@ -76,6 +80,10 @@ export function FormatterPanel({
     setContent(SAMPLE)
   }
 
+  function handleFixQuotes() {
+    if (doubledQuotesFix) setContent(doubledQuotesFix)
+  }
+
   const errorLineText = result.error ? content.split('\n')[result.error.line - 1] ?? '' : ''
 
   return (
@@ -103,6 +111,14 @@ export function FormatterPanel({
           </div>
         </div>
         <div className="flex gap-2">
+          {doubledQuotesFix && (
+            <button
+              onClick={handleFixQuotes}
+              className="border border-amber-400 px-3 py-1.5 text-xs font-bold tracking-wide text-amber-600 hover:text-amber-900 dark:border-amber-700 dark:text-amber-400 dark:hover:text-amber-200"
+            >
+              Fix Quotes
+            </button>
+          )}
           <button
             onClick={handleCopy}
             className="border border-gray-300 px-3 py-1.5 text-xs font-bold tracking-wide text-gray-500 hover:text-gray-900 dark:border-gray-700 dark:text-gray-400 dark:hover:text-gray-200"

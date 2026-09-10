@@ -37,6 +37,26 @@ function deepParseJsonStrings(value: unknown, maxDepth: number = 20): unknown {
   return value
 }
 
+export function fixDoubledQuotes(raw: string): string | null {
+  const candidates = [raw.replaceAll('""', '"')]
+
+  if (raw.length >= 2 && raw.startsWith('"') && raw.endsWith('"')) {
+    candidates.push(raw.slice(1, -1).replaceAll('""', '"'))
+  }
+
+  for (const candidate of candidates) {
+    if (candidate === raw) continue
+    try {
+      JSON.parse(candidate)
+      return candidate
+    } catch {
+      // try the next candidate
+    }
+  }
+
+  return null
+}
+
 export function minify(raw: string): string {
   const parsed = JSON.parse(raw)
   return JSON.stringify(parsed)
