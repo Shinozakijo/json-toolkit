@@ -4,8 +4,6 @@ import type { HistoryEntry } from '../hooks/useHistory'
 import { Corner } from './ui/Corner'
 import { ToggleButton } from './ui/ToggleButton'
 
-const SAMPLE = '{\n  "name": "json-toolkit",\n  "version": 1,\n  "tags": ["fast", "local"],\n  "active": true\n}'
-
 type Mode = 'beautify' | 'minify'
 
 export function FormatterPanel({
@@ -76,10 +74,6 @@ export function FormatterPanel({
     setContent('')
   }
 
-  function handleSample() {
-    setContent(SAMPLE)
-  }
-
   function handleFixQuotes() {
     if (doubledQuotesFix) setContent(doubledQuotesFix)
   }
@@ -130,12 +124,6 @@ export function FormatterPanel({
             className="border border-gray-300 px-3 py-1.5 text-xs font-bold tracking-wide text-gray-500 hover:text-gray-900 dark:border-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
           >
             Clear
-          </button>
-          <button
-            onClick={handleSample}
-            className="border border-gray-300 px-3 py-1.5 text-xs font-bold tracking-wide text-gray-500 hover:text-gray-900 dark:border-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-          >
-            Sample
           </button>
         </div>
       </div>
