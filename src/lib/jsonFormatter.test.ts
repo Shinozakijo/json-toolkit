@@ -8,12 +8,6 @@ describe('beautify', () => {
     expect(result).toBe('{\n  "a": 1,\n  "b": 2\n}')
   })
 
-  test('respects a custom indent size', () => {
-    const result = beautify('{"a":1}', 4)
-
-    expect(result).toBe('{\n    "a": 1\n}')
-  })
-
   test('expands a string field containing a nested JSON object', () => {
     const raw = JSON.stringify({ message: JSON.stringify({ a: 1 }) })
 

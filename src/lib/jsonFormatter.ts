@@ -2,9 +2,9 @@ import { JsonParseError, scanJson } from './jsonScanner'
 import type { ValidationResult } from './jsonFormatter.types'
 export type { ValidationError, ValidationResult } from './jsonFormatter.types'
 
-export function beautify(raw: string, indent: number = 2): string {
+export function beautify(raw: string): string {
   const parsed = JSON.parse(raw)
-  return JSON.stringify(deepParseJsonStrings(parsed), null, indent)
+  return JSON.stringify(deepParseJsonStrings(parsed), null, 2)
 }
 
 function deepParseJsonStrings(value: unknown, maxDepth: number = 20): unknown {

@@ -15,7 +15,6 @@ export function FormatterPanel({
 }) {
   const [content, setContent] = useState('')
   const [mode, setMode] = useState<Mode>('beautify')
-  const [indent, setIndent] = useState(2)
   const gutterRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -47,7 +46,7 @@ export function FormatterPanel({
 
   function applyBeautify() {
     try {
-      const output = beautify(content, indent)
+      const output = beautify(content)
       setContent(output)
       setMode('beautify')
       onRecordHistory?.('beautify', output)
@@ -91,17 +90,6 @@ export function FormatterPanel({
             <ToggleButton active={mode === 'minify'} onClick={applyMinify}>
               MINIFY
             </ToggleButton>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] tracking-widest text-gray-500">INDENT</span>
-            <div className="flex">
-              <ToggleButton active={indent === 2} onClick={() => setIndent(2)}>
-                2
-              </ToggleButton>
-              <ToggleButton active={indent === 4} onClick={() => setIndent(4)}>
-                4
-              </ToggleButton>
-            </div>
           </div>
         </div>
         <div className="flex gap-2">
