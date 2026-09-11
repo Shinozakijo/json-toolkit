@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { beautify, fixDoubledQuotes, minify, validate } from '../lib/jsonFormatter'
-import type { HistoryEntry } from '../hooks/useHistory'
+import type { FormatterHistoryEntry } from '../hooks/useFormatterHistory'
 import { JsonEditor } from './ui/JsonEditor'
 import { ToggleButton } from './ui/ToggleButton'
 
@@ -11,7 +11,7 @@ export function FormatterPanel({
   restoreEntry,
 }: {
   onRecordHistory?: (mode: Mode, output: string) => void
-  restoreEntry?: HistoryEntry | null
+  restoreEntry?: FormatterHistoryEntry | null
 }) {
   const [content, setContent] = useState('')
   const [mode, setMode] = useState<Mode>('beautify')

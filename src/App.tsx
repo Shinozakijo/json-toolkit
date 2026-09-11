@@ -3,32 +3,53 @@ import { ComparePanel } from './components/ComparePanel'
 import { FormatterPanel } from './components/FormatterPanel'
 import { Header, type Tab } from './components/Header'
 import { HistorySidebar } from './components/HistorySidebar'
-import { useHistory, type HistoryEntry } from './hooks/useHistory'
+import { useCompareHistory, type CompareHistoryEntry } from './hooks/useCompareHistory'
+import { useFormatterHistory, type FormatterHistoryEntry } from './hooks/useFormatterHistory'
 import { useTheme } from './hooks/useTheme'
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>('formatter')
   const { theme, toggleTheme } = useTheme()
-  const { entries, addEntry, clear } = useHistory()
+  const formatterHistory = useFormatterHistory()
+  const compareHistory = useCompareHistory()
   const [sidebarOpen, setSidebarOpen] = useState(true)
-  const [restoreEntry, setRestoreEntry] = useState<HistoryEntry | null>(null)
+  const [restoreFormatterEntry, setRestoreFormatterEntry] = useState<FormatterHistoryEntry | null>(null)
+  const [restoreCompareEntry, setRestoreCompareEntry] = useState<CompareHistoryEntry | null>(null)
+
+  function handleTabChange(tab: Tab) {
+    setActiveTab(tab)
+    setRestoreFormatterEntry(null)
+    setRestoreCompareEntry(null)
+  }
 
   return (
     <div className="flex h-screen flex-col bg-white font-mono text-gray-900 dark:bg-[#0b0b0d] dark:text-gray-200">
-      <Header activeTab={activeTab} onTabChange={setActiveTab} theme={theme} onToggleTheme={toggleTheme} />
+      <Header activeTab={activeTab} onTabChange={handleTabChange} theme={theme} onToggleTheme={toggleTheme} />
       <div className="flex min-h-0 min-w-0 flex-1">
-        <HistorySidebar
-          entries={entries}
-          open={sidebarOpen}
-          onToggle={() => setSidebarOpen((v) => !v)}
-          onClear={clear}
-          onSelect={setRestoreEntry}
-        />
+        {activeTab === 'formatter' ? (
+          <HistorySidebar
+            kind="formatter"
+            entries={formatterHistory.entries}
+            open={sidebarOpen}
+            onToggle={() => setSidebarOpen((v) => !v)}
+            onClear={formatterHistory.clear}
+            onSelect={setRestoreFormatterEntry}
+          />
+        ) : (
+          <HistorySidebar
+            kind="compare"
+            entries={compareHistory.entries}
+            open={sidebarOpen}
+            onToggle={() => setSidebarOpen((v) => !v)}
+            onClear={compareHistory.clear}
+            onSelect={setRestoreCompareEntry}
+          />
+        )}
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
           {activeTab === 'formatter' ? (
-            <FormatterPanel onRecordHistory={addEntry} restoreEntry={restoreEntry} />
+            <FormatterPanel onRecordHistory={formatterHistory.addEntry} restoreEntry={restoreFormatterEntry} />
           ) : (
-            <ComparePanel />
+            <ComparePanel onRecordHistory={compareHistory.addEntry} restoreEntry={restoreCompareEntry} />
           )}
         </div>
       </div>

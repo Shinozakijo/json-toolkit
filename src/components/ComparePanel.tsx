@@ -1,39 +1,21 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { diffJson } from '../lib/jsonDiff'
 import type { DiffEntry, DiffType } from '../lib/jsonDiff.types'
 import { prepareForCompare } from '../lib/jsonFormatter'
+import type { CompareHistoryEntry, CompareHistorySummary } from '../hooks/useCompareHistory'
 import { JsonEditor } from './ui/JsonEditor'
 import { ToggleButton } from './ui/ToggleButton'
 
 type SideStatus = { valid: true } | { valid: false; line: number }
 type Filter = 'all' | DiffType
 
-const SAMPLE_A = JSON.stringify(
-  {
-    service: 'checkout',
-    version: 3,
-    region: 'ap-southeast-1',
-    user: { name: 'Anan', address: { city: 'Bangkok', zip: '10110' } },
-    flags: { beta: false, timeoutMs: 1500 },
-    hosts: ['a.internal', 'b.internal'],
-  },
-  null,
-  2,
-)
-
-const SAMPLE_B = JSON.stringify(
-  {
-    service: 'checkout',
-    version: 4,
-    user: { name: 'Anan', address: { city: 'Chiang Mai', zip: '50000', country: 'TH' } },
-    flags: { beta: true, timeoutMs: 3000, tracing: true },
-    hosts: ['a.internal', 'c.internal'],
-  },
-  null,
-  2,
-)
-
-export function ComparePanel() {
+export function ComparePanel({
+  onRecordHistory,
+  restoreEntry,
+}: {
+  onRecordHistory?: (a: string, b: string, summary: CompareHistorySummary) => void
+  restoreEntry?: CompareHistoryEntry | null
+} = {}) {
   const [rawA, setRawA] = useState('')
   const [rawB, setRawB] = useState('')
   const [statusA, setStatusA] = useState<SideStatus | null>(null)
@@ -41,16 +23,36 @@ export function ComparePanel() {
   const [diffEntries, setDiffEntries] = useState<DiffEntry[] | null>(null)
   const [filter, setFilter] = useState<Filter>('all')
 
+  useEffect(() => {
+    if (restoreEntry) {
+      setRawA(restoreEntry.a)
+      setRawB(restoreEntry.b)
+      runCompare(restoreEntry.a, restoreEntry.b, { record: false })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [restoreEntry?.id])
+
   function handleCompare() {
-    const resultA = prepareForCompare(rawA)
-    const resultB = prepareForCompare(rawB)
+    runCompare(rawA, rawB, { record: true })
+  }
+
+  function runCompare(inputA: string, inputB: string, { record }: { record: boolean }) {
+    const resultA = prepareForCompare(inputA)
+    const resultB = prepareForCompare(inputB)
 
     setRawA(resultA.text)
     setRawB(resultB.text)
     setStatusA(resultA.valid ? { valid: true } : { valid: false, line: resultA.line })
     setStatusB(resultB.valid ? { valid: true } : { valid: false, line: resultB.line })
-    setDiffEntries(resultA.valid && resultB.valid ? diffJson(resultA.parsed, resultB.parsed) : null)
     setFilter('all')
+
+    if (resultA.valid && resultB.valid) {
+      const nextDiffEntries = diffJson(resultA.parsed, resultB.parsed)
+      setDiffEntries(nextDiffEntries)
+      if (record) onRecordHistory?.(resultA.text, resultB.text, countByType(nextDiffEntries))
+    } else {
+      setDiffEntries(null)
+    }
   }
 
   function handleSwap() {
@@ -65,15 +67,6 @@ export function ComparePanel() {
   function handleClear() {
     setRawA('')
     setRawB('')
-    setStatusA(null)
-    setStatusB(null)
-    setDiffEntries(null)
-    setFilter('all')
-  }
-
-  function handleSamplePair() {
-    setRawA(SAMPLE_A)
-    setRawB(SAMPLE_B)
     setStatusA(null)
     setStatusB(null)
     setDiffEntries(null)
@@ -104,12 +97,6 @@ export function ComparePanel() {
           className="border border-gray-300 px-3 py-1.5 text-xs font-bold tracking-wide text-gray-500 hover:text-gray-900 dark:border-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
         >
           Clear
-        </button>
-        <button
-          onClick={handleSamplePair}
-          className="border border-gray-300 px-3 py-1.5 text-xs font-bold tracking-wide text-gray-500 hover:text-gray-900 dark:border-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-        >
-          Sample pair
         </button>
       </div>
 
