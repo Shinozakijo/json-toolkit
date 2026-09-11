@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { beautify, fixDoubledQuotes, minify, validate } from '../lib/jsonFormatter'
 import type { HistoryEntry } from '../hooks/useHistory'
-import { Corner } from './ui/Corner'
+import { JsonEditor } from './ui/JsonEditor'
 import { ToggleButton } from './ui/ToggleButton'
 
 type Mode = 'beautify' | 'minify'
@@ -15,7 +15,6 @@ export function FormatterPanel({
 }) {
   const [content, setContent] = useState('')
   const [mode, setMode] = useState<Mode>('beautify')
-  const gutterRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (restoreEntry) {
@@ -36,14 +35,6 @@ export function FormatterPanel({
     const bytes = new TextEncoder().encode(content).length
     return { lines, chars, bytes }
   }, [content])
-  const lineCount = content.split('\n').length
-
-  function handleScroll(e: React.UIEvent<HTMLTextAreaElement>) {
-    if (gutterRef.current) {
-      gutterRef.current.scrollTop = e.currentTarget.scrollTop
-    }
-  }
-
   function applyBeautify() {
     try {
       const output = beautify(content)
@@ -116,32 +107,7 @@ export function FormatterPanel({
         </div>
       </div>
 
-      <div className="relative m-4 flex min-h-70 min-w-80 flex-1 flex-col overflow-hidden border border-gray-200 dark:border-gray-800">
-        <Corner className="-left-1.5 -top-1.5" />
-        <Corner className="-right-1.5 -top-1.5" />
-        <Corner className="-bottom-1.5 -left-1.5" />
-        <Corner className="-bottom-1.5 -right-1.5" />
-        <div className="flex min-h-0 min-w-0 flex-1">
-          <div
-            ref={gutterRef}
-            aria-hidden="true"
-            className="select-none overflow-hidden bg-gray-50 p-4 text-right font-mono text-sm leading-normal text-gray-400 dark:bg-gray-900/40 dark:text-gray-600"
-          >
-            {Array.from({ length: lineCount }, (_, i) => (
-              <div key={i}>{i + 1}</div>
-            ))}
-          </div>
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            onScroll={handleScroll}
-            spellCheck={false}
-            wrap="off"
-            placeholder="Paste or type JSON here..."
-            className="scrollbar-thin w-full flex-1 resize-none overflow-x-auto whitespace-pre bg-transparent p-4 font-mono text-sm leading-normal text-gray-900 outline-none placeholder:text-gray-400 dark:text-gray-200 dark:placeholder:text-gray-600"
-          />
-        </div>
-      </div>
+      <JsonEditor value={content} onChange={setContent} />
 
       <div className="flex items-center justify-between border-y border-gray-200 px-6 py-2 text-xs text-gray-500 dark:border-gray-800">
         <span>

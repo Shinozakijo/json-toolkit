@@ -57,6 +57,29 @@ export function fixDoubledQuotes(raw: string): string | null {
   return null
 }
 
+export type PrepareForCompareResult =
+  | { valid: true; text: string; parsed: unknown }
+  | { valid: false; text: string; line: number }
+
+export function prepareForCompare(raw: string): PrepareForCompareResult {
+  let candidate = raw
+  let result = validate(candidate)
+
+  if (!result.valid) {
+    const fixed = fixDoubledQuotes(raw)
+    if (fixed !== null) {
+      candidate = fixed
+      result = validate(candidate)
+    }
+  }
+
+  if (!result.valid) {
+    return { valid: false, text: raw, line: result.error?.line ?? 1 }
+  }
+
+  return { valid: true, text: beautify(candidate), parsed: JSON.parse(candidate) }
+}
+
 export function minify(raw: string): string {
   const parsed = JSON.parse(raw)
   return JSON.stringify(parsed)

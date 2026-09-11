@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { ComparePanel } from './components/ComparePanel'
 import { FormatterPanel } from './components/FormatterPanel'
 import { Header, type Tab } from './components/Header'
 import { HistorySidebar } from './components/HistorySidebar'
@@ -27,9 +28,7 @@ function App() {
           {activeTab === 'formatter' ? (
             <FormatterPanel onRecordHistory={addEntry} restoreEntry={restoreEntry} />
           ) : (
-            <div className="flex flex-1 items-center justify-center text-sm text-gray-400 dark:text-gray-600">
-              Compare — coming soon
-            </div>
+            <ComparePanel />
           )}
         </div>
       </div>

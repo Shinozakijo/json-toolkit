@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { beautify, fixDoubledQuotes, minify, validate } from './jsonFormatter'
+import { beautify, fixDoubledQuotes, minify, prepareForCompare, validate } from './jsonFormatter'
 
 describe('beautify', () => {
   test('formats a flat object with 2-space indent by default', () => {
@@ -275,5 +275,35 @@ describe('fixDoubledQuotes', () => {
     const result = fixDoubledQuotes(doubleWrapped)
 
     expect(result).toBe('{"action":"[EXCEPTION]","level":"error"}')
+  })
+})
+
+describe('prepareForCompare', () => {
+  test('beautifies already-valid JSON and returns the parsed value', () => {
+    const result = prepareForCompare('{"b":2,"a":1}')
+
+    expect(result).toEqual({
+      valid: true,
+      text: '{\n  "b": 2,\n  "a": 1\n}',
+      parsed: { b: 2, a: 1 },
+    })
+  })
+
+  test('fixes doubled quotes before beautifying when the raw text does not parse', () => {
+    const result = prepareForCompare('{""a"":1}')
+
+    expect(result).toEqual({
+      valid: true,
+      text: '{\n  "a": 1\n}',
+      parsed: { a: 1 },
+    })
+  })
+
+  test('leaves the raw text untouched and reports the error line when unfixable', () => {
+    const raw = '{\n  "a": 1,\n  "b": }'
+
+    const result = prepareForCompare(raw)
+
+    expect(result).toEqual({ valid: false, text: raw, line: 3 })
   })
 })
