@@ -15,7 +15,7 @@ function App() {
   return (
     <div className="flex h-screen flex-col bg-white font-mono text-gray-900 dark:bg-[#0b0b0d] dark:text-gray-200">
       <Header activeTab={activeTab} onTabChange={setActiveTab} theme={theme} onToggleTheme={toggleTheme} />
-      <div className="flex min-h-0 flex-1">
+      <div className="flex min-h-0 min-w-0 flex-1">
         <HistorySidebar
           entries={entries}
           open={sidebarOpen}
@@ -23,7 +23,7 @@ function App() {
           onClear={clear}
           onSelect={setRestoreEntry}
         />
-        <div className="flex min-h-0 flex-1 flex-col">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col">
           {activeTab === 'formatter' ? (
             <FormatterPanel onRecordHistory={addEntry} restoreEntry={restoreEntry} />
           ) : (

@@ -81,7 +81,7 @@ export function FormatterPanel({
   const errorLineText = result.error ? content.split('\n')[result.error.line - 1] ?? '' : ''
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
+    <div className="flex min-h-0 min-w-0 flex-1 flex-col">
       <div className="flex items-center justify-between border-b border-gray-200 px-6 py-3 dark:border-gray-800">
         <div className="flex items-center gap-6">
           <div className="flex">
@@ -128,12 +128,12 @@ export function FormatterPanel({
         </div>
       </div>
 
-      <div className="relative m-4 flex min-h-0 flex-1 flex-col border border-gray-200 dark:border-gray-800">
+      <div className="relative m-4 flex min-h-70 min-w-80 flex-1 flex-col overflow-hidden border border-gray-200 dark:border-gray-800">
         <Corner className="-left-1.5 -top-1.5" />
         <Corner className="-right-1.5 -top-1.5" />
         <Corner className="-bottom-1.5 -left-1.5" />
         <Corner className="-bottom-1.5 -right-1.5" />
-        <div className="flex min-h-[320px] flex-1">
+        <div className="flex min-h-0 min-w-0 flex-1">
           <div
             ref={gutterRef}
             aria-hidden="true"
@@ -148,8 +148,9 @@ export function FormatterPanel({
             onChange={(e) => setContent(e.target.value)}
             onScroll={handleScroll}
             spellCheck={false}
+            wrap="off"
             placeholder="Paste or type JSON here..."
-            className="scrollbar-thin w-full flex-1 resize-none bg-transparent p-4 font-mono text-sm leading-normal text-gray-900 outline-none placeholder:text-gray-400 dark:text-gray-200 dark:placeholder:text-gray-600"
+            className="scrollbar-thin w-full flex-1 resize-none overflow-x-auto whitespace-pre bg-transparent p-4 font-mono text-sm leading-normal text-gray-900 outline-none placeholder:text-gray-400 dark:text-gray-200 dark:placeholder:text-gray-600"
           />
         </div>
       </div>
@@ -164,7 +165,7 @@ export function FormatterPanel({
       </div>
 
       {content.length > 0 && result.error && (
-        <div className="m-4 border border-red-300 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950/20">
+        <div className="m-4 min-w-0 overflow-hidden border border-red-300 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950/20">
           <div className="flex items-baseline gap-3">
             <span className="text-sm font-bold tracking-wide text-red-600 dark:text-red-400">PARSE ERROR</span>
             <span className="text-xs text-gray-500 dark:text-gray-400">
@@ -172,7 +173,7 @@ export function FormatterPanel({
             </span>
           </div>
           <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">{result.error.message}</p>
-          <pre className="mt-3 overflow-x-auto bg-black/5 p-3 text-sm text-gray-700 dark:bg-black/30 dark:text-gray-300">
+          <pre className="scrollbar-thin mt-3 overflow-x-auto bg-black/5 p-3 text-sm text-gray-700 dark:bg-black/30 dark:text-gray-300">
             <code>
               {String(result.error.line).padStart(2, ' ')} | {errorLineText}
               {'\n'}
